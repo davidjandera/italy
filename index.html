@@ -32,7 +32,7 @@
   map.on('load', function () {
     map.addSource('capitals', {
       type: 'geojson',
-      data: 'mapbox.geojson' // Nahraďte skutečnou URL vaší GeoJSON daty
+      data: 'mapbox.json' // Nahraďte skutečnou URL vaší GeoJSON daty
     });
 
     map.addLayer({
@@ -47,9 +47,9 @@
     });
 
     // Přidejte vlastní ikony jako piny
-    map.getSource('capitals').setData('mapbox.geojson');
+    map.getSource('capitals').setData('mapbox.json');
 
-    fetch('mapbox.geojson')
+    fetch('mapbox.json')
       .then(response => response.json())
       .then(data => {
         data.features.forEach(function(marker) {
