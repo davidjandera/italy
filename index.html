@@ -147,13 +147,15 @@
     function updateMarkers() {
       const zoom = map.getZoom();
       const features = map.querySourceFeatures('capitals');
-      
+
       const clusteredFeatures = features.filter(feature => feature.properties.cluster);
       const pointFeatures = features.filter(feature => !feature.properties.cluster);
-      
+
       // Hide all markers initially
-      Object.values(markers).forEach(marker => marker.getElement().style.display = 'none');
-      
+      Object.values(markers).forEach(marker => {
+        marker.getElement().style.display = 'none';
+      });
+
       // Show individual points
       pointFeatures.forEach(feature => {
         const id = feature.properties.id;
@@ -161,8 +163,6 @@
           markers[id].getElement().style.display = 'block';
         }
       });
-      
-      // Process clusters (no need to show markers for clusters, as they are rendered by the cluster layer)
     }
 
     // Update markers on map events
@@ -171,7 +171,7 @@
         updateMarkers();
       }
     });
-    
+
     map.on('moveend', updateMarkers);
     map.on('zoomend', updateMarkers);
 
