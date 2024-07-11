@@ -35,7 +35,7 @@
   async function fetchGoogleSheetsData() {
     const apiKey = 'AIzaSyCpgbO0B6V0eEiVfyt6xewv0cHjyYsj1-o'; // Nahraďte vaším Google Sheets API klíčem
     const spreadsheetId = '1YtHqKg22xPXglCKOYOzCYTK4Om1_WhjaogZTCHnfzf8'; // Nahraďte ID vaší tabulky Google Sheets
-    const range = 'Sheet1!A:E'; // Přizpůsobte název listu a rozsah podle potřeby
+    const range = 'mapa!A:E'; // Přizpůsobte název listu a rozsah podle potřeby
 
     const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`);
     const data = await response.json();
