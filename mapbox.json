@@ -4,7 +4,7 @@
     {
       "type": "Feature",
       "geometry": {
-        "type": "Circle",
+        "type": "Point",
         "coordinates": [14.42076, 50.08804]
       },
       "properties": {
@@ -16,7 +16,7 @@
     {
       "type": "Feature",
       "geometry": {
-        "type": "Circle",
+        "type": "Point",
         "coordinates": [2.35222, 48.85661]
       },
       "properties": {
