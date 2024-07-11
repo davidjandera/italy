@@ -17,7 +17,7 @@
       background-size: cover;
       background-position: center;
     }
-    .cluster-marker {
+    .cluster-count {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -122,13 +122,14 @@
       }
     });
 
+    // Add the unclustered points layer with a transparent icon to create custom markers later
     map.addLayer({
       id: 'unclustered-point',
       type: 'symbol',
       source: 'capitals',
       filter: ['!', ['has', 'point_count']],
       layout: {
-        'icon-image': 'custom-marker',
+        'icon-image': 'transparent-marker',
         'icon-size': 1
       }
     });
