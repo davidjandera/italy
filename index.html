@@ -122,14 +122,14 @@
       }
     });
 
-    // Add the unclustered points layer with a transparent icon to create custom markers later
+    // Add the unclustered points layer with custom markers
     map.addLayer({
       id: 'unclustered-point',
       type: 'symbol',
       source: 'capitals',
       filter: ['!', ['has', 'point_count']],
       layout: {
-        'icon-image': 'transparent-marker',
+        'icon-image': ['get', 'icon'],
         'icon-size': 1
       }
     });
