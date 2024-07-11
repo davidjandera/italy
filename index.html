@@ -17,6 +17,17 @@
       background-size: cover;
       background-position: center;
     }
+    .cluster-marker {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: rgba(0, 100, 255, 0.5);
+      color: white;
+      font-size: 12px;
+    }
   </style>
 </head>
 <body>
@@ -28,7 +39,7 @@
     container: 'map',
     style: 'mapbox://styles/mapbox/streets-v11',
     center: [10, 50], // Přibližný střed Evropy
-    zoom: 4
+    zoom: 6
   });
 
   // Function to fetch Google Sheets data
@@ -113,15 +124,30 @@
 
     map.addLayer({
       id: 'unclustered-point',
-      type: 'circle',
+      type: 'symbol',
       source: 'capitals',
       filter: ['!', ['has', 'point_count']],
-      paint: {
-        'circle-color': '#11b4da',
-        'circle-radius': 4,
-        'circle-stroke-width': 1,
-        'circle-stroke-color': '#fff'
+      layout: {
+        'icon-image': 'custom-marker',
+        'icon-size': 1
       }
+    });
+
+    // Add custom markers for unclustered points
+    features.forEach(function(feature) {
+      var el = document.createElement('div');
+      el.className = 'marker';
+      el.style.backgroundImage = 'url(' + feature.properties.imageUrl + ')';
+
+      new mapboxgl.Marker(el)
+        .setLngLat(feature.geometry.coordinates)
+        .addTo(map)
+        .getElement().addEventListener('click', function() {
+          new mapboxgl.Popup()
+            .setLngLat(feature.geometry.coordinates)
+            .setHTML(`<strong>${feature.properties.city}, ${feature.properties.country}</strong>`)
+            .addTo(map);
+        });
     });
 
     map.on('click', 'clusters', function (e) {
