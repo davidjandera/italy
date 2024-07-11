@@ -10,8 +10,8 @@
     body { margin:0; padding:0; }
     #map { position:absolute; top:0; bottom:0; width:100%; }
     .marker {
-      width: 10px;
-      height: 10px;
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
       border: 2px solid white;
       background-size: cover;
@@ -21,8 +21,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      width: 30px;
-      height: 30px;
+      width: 25px;
+      height: 25px;
       border-radius: 50%;
       background-color: rgba(0, 100, 255, 0.5);
       color: white;
@@ -81,7 +81,7 @@
       },
       cluster: true,
       clusterMaxZoom: 14, // Max zoom to cluster points on
-      clusterRadius: 100 // Radius of each cluster when clustering points (defaults to 50)
+      clusterRadius: 10 // Radius of each cluster when clustering points (defaults to 50)
     });
 
     map.addLayer({
