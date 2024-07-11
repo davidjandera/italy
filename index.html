@@ -42,7 +42,7 @@
     zoom: 4
   });
 
-  // Function to fetch Google Sheets data
+  // Funkce pro načtení dat z Google Sheets
   async function fetchGoogleSheetsData() {
     const apiKey = 'AIzaSyCpgbO0B6V0eEiVfyt6xewv0cHjyYsj1-o'; // Nahraďte vaším Google Sheets API klíčem
     const spreadsheetId = '1YtHqKg22xPXglCKOYOzCYTK4Om1_WhjaogZTCHnfzf8'; // Nahraďte ID vaší tabulky Google Sheets
@@ -56,7 +56,7 @@
   map.on('load', async function () {
     const rows = await fetchGoogleSheetsData();
 
-    const features = rows.slice(1).map(function(row) { // Skip header row
+    const features = rows.slice(1).map(function(row) { // Přeskočení řádku s hlavičkami
       const [city, country, lat, lng, imageUrl] = row;
       return {
         type: 'Feature',
@@ -80,8 +80,8 @@
         features: features
       },
       cluster: true,
-      clusterMaxZoom: 14, // Max zoom to cluster points on
-      clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
+      clusterMaxZoom: 14, // Maximální zoom pro clusterování bodů
+      clusterRadius: 50 // Poloměr každého clusteru při clusterování bodů (výchozí hodnota je 50)
     });
 
     map.addLayer({
