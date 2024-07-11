@@ -63,7 +63,8 @@
         properties: {
           city: city,
           country: country,
-          imageUrl: imageUrl
+          imageUrl: imageUrl,
+          id: city
         },
         geometry: {
           type: 'Point',
@@ -123,24 +124,13 @@
     });
 
     // Add the unclustered points layer with custom markers
-    map.addLayer({
-      id: 'unclustered-point',
-      type: 'symbol',
-      source: 'capitals',
-      filter: ['!', ['has', 'point_count']],
-      layout: {
-        'icon-image': ['get', 'icon'],
-        'icon-size': 1
-      }
-    });
-
-    // Add custom markers for unclustered points
+    const markers = {};
     features.forEach(function(feature) {
       var el = document.createElement('div');
       el.className = 'marker';
       el.style.backgroundImage = 'url(' + feature.properties.imageUrl + ')';
 
-      new mapboxgl.Marker(el)
+      var marker = new mapboxgl.Marker(el)
         .setLngLat(feature.geometry.coordinates)
         .addTo(map)
         .getElement().addEventListener('click', function() {
@@ -149,7 +139,41 @@
             .setHTML(`<strong>${feature.properties.city}, ${feature.properties.country}</strong>`)
             .addTo(map);
         });
+
+      markers[feature.properties.id] = marker;
     });
+
+    // Function to update marker visibility based on cluster state
+    function updateMarkers() {
+      const zoom = map.getZoom();
+      const features = map.querySourceFeatures('capitals');
+      
+      const clusteredFeatures = features.filter(feature => feature.properties.cluster);
+      const pointFeatures = features.filter(feature => !feature.properties.cluster);
+      
+      // Hide all markers initially
+      Object.values(markers).forEach(marker => marker.getElement().style.display = 'none');
+      
+      // Show individual points
+      pointFeatures.forEach(feature => {
+        const id = feature.properties.id;
+        if (markers[id]) {
+          markers[id].getElement().style.display = 'block';
+        }
+      });
+      
+      // Process clusters (no need to show markers for clusters, as they are rendered by the cluster layer)
+    }
+
+    // Update markers on map events
+    map.on('data', (e) => {
+      if (e.sourceId === 'capitals' && e.isSourceLoaded) {
+        updateMarkers();
+      }
+    });
+    
+    map.on('moveend', updateMarkers);
+    map.on('zoomend', updateMarkers);
 
     map.on('click', 'clusters', function (e) {
       var features = map.queryRenderedFeatures(e.point, {
