@@ -9,56 +9,69 @@
   <style>
     body { margin:0; padding:0; }
     #map { position:absolute; top:0; bottom:0; width:100%; }
+    .marker {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 5px solid white;
+      background-size: cover;
+    }
   </style>
 </head>
 <body>
 <div id="map"></div>
 <script>
-  mapboxgl.accessToken = 'pk.eyJ1IjoiZGphbmRlcmEiLCJhIjoiY2ptZzJ4NXhqMnJ4ZjNrbnRiMm1haHhrcSJ9.8U9iRQu8sGnE7AQ1C7VI4Q';
+  mapboxgl.accessToken = 'pk.eyJ1IjoiZGphbmRlcmEiLCJhIjoiY2ptZzJ4NXhqMnJ4ZjNrbnRiMm1haHhrcSJ9.8U9iRQu8sGnE7AQ1C7VI4Q'; // Nahraďte vaším Mapbox Access Tokenem
   var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/streets-v11',
-    center: [14.42076, 50.08804], // Prague coordinates
+    center: [10, 50], // Přibližný střed Evropy
     zoom: 4
   });
 
   map.on('load', function () {
     map.addSource('capitals', {
       type: 'geojson',
-      data: 'mapbox.json'
+      data: 'mapbox.geojson' // Nahraďte skutečnou URL vaší GeoJSON daty
     });
 
     map.addLayer({
       id: 'capitals',
-      type: 'circle',
+      type: 'symbol',
       source: 'capitals',
-      paint: {
-        'circle-radius': 6,
-        'circle-color': '#B42222'
+      layout: {
+        'icon-image': ['get', 'city'], // Odkazuje na název obrázku (ikon)
+        'icon-size': 1,
+        'icon-allow-overlap': true
       }
     });
 
-    map.on('click', 'capitals', function (e) {
-      var coordinates = e.features[0].geometry.coordinates.slice();
-      var description = `<strong>${e.features[0].properties.city}, ${e.features[0].properties.country}</strong><br><img src="${e.features[0].properties.image}" alt="Image" width="200" />`;
+    // Přidejte vlastní ikony jako piny
+    map.getSource('capitals').setData('mapbox.geojson');
 
-      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-      }
+    fetch('mapbox.geojson')
+      .then(response => response.json())
+      .then(data => {
+        data.features.forEach(function(marker) {
+          // Vytvořte DOM element pro každý marker
+          var el = document.createElement('div');
+          el.className = 'marker';
+          el.style.backgroundImage = 'url(' + marker.properties.image + ')';
 
-      new mapboxgl.Popup()
-        .setLngLat(coordinates)
-        .setHTML(description)
-        .addTo(map);
-    });
+          // Vytvořte marker a přidejte do mapy
+          new mapboxgl.Marker(el)
+            .setLngLat(marker.geometry.coordinates)
+            .addTo(map);
 
-    map.on('mouseenter', 'capitals', function () {
-      map.getCanvas().style.cursor = 'pointer';
-    });
-
-    map.on('mouseleave', 'capitals', function () {
-      map.getCanvas().style.cursor = '';
-    });
+          // Přidání vyskakovacího okna s popisem
+          el.addEventListener('click', function() {
+            new mapboxgl.Popup()
+              .setLngLat(marker.geometry.coordinates)
+              .setHTML(`<strong>${marker.properties.city}, ${marker.properties.country}</strong>`)
+              .addTo(map);
+          });
+        });
+      });
   });
 </script>
 </body>
