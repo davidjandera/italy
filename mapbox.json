@@ -4,25 +4,25 @@
     {
       "type": "Feature",
       "geometry": {
-        "type": "Point",
+        "type": "Circle",
         "coordinates": [14.42076, 50.08804]
       },
       "properties": {
         "city": "Prague",
         "country": "Czech Republic",
-        "image": "https://images.app.goo.gl/395Row9BsyhsU6yr7"
+        "image": "https://img0.oastatic.com/img2/77260416/420x237r/variant.jpg"
       }
     },
     {
       "type": "Feature",
       "geometry": {
-        "type": "Point",
+        "type": "Circle",
         "coordinates": [2.35222, 48.85661]
       },
       "properties": {
         "city": "Paris",
         "country": "France",
-        "image": "https://images.app.goo.gl/5sWGjWNhEZ7fSU1J8"
+        "image": "https://images.adsttc.com/media/images/5d44/14fa/284d/d1fd/3a00/003d/large_jpg/eiffel-tower-in-paris-151-medium.jpg"
       }
     }
   ]
