@@ -1,7 +1,65 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <meta charset="utf-8" />
+  <title>European Capitals Map</title>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css" rel="stylesheet" />
+  <style>
+    body { margin:0; padding:0; }
+    #map { position:absolute; top:0; bottom:0; width:100%; }
+  </style>
+</head>
 <body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
+<div id="map"></div>
+<script>
+  mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN';
+  var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v11',
+    center: [14.42076, 50.08804], // Prague coordinates
+    zoom: 4
+  });
+
+  map.on('load', function () {
+    map.addSource('capitals', {
+      type: 'geojson',
+      data: 'path_to_your_geojson_file.geojson'
+    });
+
+    map.addLayer({
+      id: 'capitals',
+      type: 'circle',
+      source: 'capitals',
+      paint: {
+        'circle-radius': 6,
+        'circle-color': '#B42222'
+      }
+    });
+
+    map.on('click', 'capitals', function (e) {
+      var coordinates = e.features[0].geometry.coordinates.slice();
+      var description = `<strong>${e.features[0].properties.city}, ${e.features[0].properties.country}</strong><br><img src="${e.features[0].properties.image}" alt="Image" width="200" />`;
+
+      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+      }
+
+      new mapboxgl.Popup()
+        .setLngLat(coordinates)
+        .setHTML(description)
+        .addTo(map);
+    });
+
+    map.on('mouseenter', 'capitals', function () {
+      map.getCanvas().style.cursor = 'pointer';
+    });
+
+    map.on('mouseleave', 'capitals', function () {
+      map.getCanvas().style.cursor = '';
+    });
+  });
+</script>
 </body>
 </html>
