@@ -10,8 +10,8 @@
     body { margin:0; padding:0; }
     #map { position:absolute; top:0; bottom:0; width:100%; }
     .marker {
-      width: 50px;
-      height: 50px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       border: 2px solid white;
       background-size: cover;
@@ -42,7 +42,7 @@
     zoom: 4
   });
 
-  // Funkce pro načtení dat z Google Sheets
+  // Function to fetch Google Sheets data
   async function fetchGoogleSheetsData() {
     const apiKey = 'AIzaSyCpgbO0B6V0eEiVfyt6xewv0cHjyYsj1-o'; // Nahraďte vaším Google Sheets API klíčem
     const spreadsheetId = '1YtHqKg22xPXglCKOYOzCYTK4Om1_WhjaogZTCHnfzf8'; // Nahraďte ID vaší tabulky Google Sheets
@@ -56,7 +56,7 @@
   map.on('load', async function () {
     const rows = await fetchGoogleSheetsData();
 
-    const features = rows.slice(1).map(function(row) { // Přeskočení řádku s hlavičkami
+    const features = rows.slice(1).map(function(row) { // Skip header row
       const [city, country, lat, lng, imageUrl] = row;
       return {
         type: 'Feature',
@@ -80,17 +80,9 @@
         features: features
       },
       cluster: true,
-      clusterMaxZoom: 14, // Maximální zoom pro clusterování bodů
-      clusterRadius: 50 // Poloměr každého clusteru při clusterování bodů (výchozí hodnota je 50)
+      clusterMaxZoom: 14, // Max zoom to cluster points on
+      clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
     });
-
-    map.loadImage(
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Bitmap_VS_SVG.svg/1200px-Bitmap_VS_SVG.svg.png',
-      function(error, image) {
-        if (error) throw error;
-        map.addImage('custom-marker', image);
-      }
-    );
 
     map.addLayer({
       id: 'clusters',
@@ -131,24 +123,57 @@
       }
     });
 
-    map.addLayer({
-      id: 'unclustered-point',
-      type: 'symbol',
-      source: 'capitals',
-      filter: ['!', ['has', 'point_count']],
-      layout: {
-        'icon-image': 'custom-marker', // Použití vlastního obrázku jako ikony
-        'icon-size': 0.6,
-        'icon-anchor': 'bottom',
-        'text-field': '{city}, {country}',
-        'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-        'text-offset': [0, 0.6],
-        'text-anchor': 'top'
-      },
-      paint: {
-        'text-color': '#ffffff'
+    // Add the unclustered points layer with custom markers
+    const markers = {};
+    features.forEach(function(feature) {
+      var el = document.createElement('div');
+      el.className = 'marker';
+      el.style.backgroundImage = 'url(' + feature.properties.imageUrl + ')';
+
+      var marker = new mapboxgl.Marker(el)
+        .setLngLat(feature.geometry.coordinates)
+        .addTo(map)
+        .getElement().addEventListener('click', function() {
+          new mapboxgl.Popup()
+            .setLngLat(feature.geometry.coordinates)
+            .setHTML(`<strong>${feature.properties.city}, ${feature.properties.country}</strong>`)
+            .addTo(map);
+        });
+
+      markers[feature.properties.id] = marker;
+    });
+
+    // Function to update marker visibility based on cluster state
+    function updateMarkers() {
+      const zoom = map.getZoom();
+      const features = map.querySourceFeatures('capitals');
+      
+      const clusteredFeatures = features.filter(feature => feature.properties.cluster);
+      const pointFeatures = features.filter(feature => !feature.properties.cluster);
+      
+      // Hide all markers initially
+      Object.values(markers).forEach(marker => marker.getElement().style.display = 'none');
+      
+      // Show individual points
+      pointFeatures.forEach(feature => {
+        const id = feature.properties.id;
+        if (markers[id]) {
+          markers[id].getElement().style.display = 'block';
+        }
+      });
+      
+      // Process clusters (no need to show markers for clusters, as they are rendered by the cluster layer)
+    }
+
+    // Update markers on map events
+    map.on('data', (e) => {
+      if (e.sourceId === 'capitals' && e.isSourceLoaded) {
+        updateMarkers();
       }
     });
+    
+    map.on('moveend', updateMarkers);
+    map.on('zoomend', updateMarkers);
 
     map.on('click', 'clusters', function (e) {
       var features = map.queryRenderedFeatures(e.point, {
@@ -183,12 +208,6 @@
     });
     map.on('mouseleave', 'clusters', function () {
       map.getCanvas().style.cursor = '';
-    });
-
-    map.on('data', (e) => {
-      if (e.sourceId === 'capitals' && e.isSourceLoaded) {
-        map.setLayoutProperty('unclustered-point', 'visibility', 'visible');
-      }
     });
   });
 </script>
