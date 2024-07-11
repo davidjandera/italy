@@ -73,28 +73,30 @@
       range: range,
     }).then(response => {
       const rows = response.result.values;
-      rows.slice(1).forEach(function(row) { // Skip header row
-        const [city, country, lat, lng, imageUrl] = row;
-        const coordinates = [parseFloat(lng), parseFloat(lat)];
+      if (rows.length > 1) { // Kontroluje, zda tabulka obsahuje nějaká data
+        rows.slice(1).forEach(function(row) { // Skip header row
+          const [city, country, lat, lng, imageUrl] = row;
+          const coordinates = [parseFloat(lng), parseFloat(lat)];
 
-        // Vytvořte DOM element pro každý marker
-        var el = document.createElement('div');
-        el.className = 'marker';
-        el.style.backgroundImage = 'url(' + imageUrl + ')';
+          // Vytvořte DOM element pro každý marker
+          var el = document.createElement('div');
+          el.className = 'marker';
+          el.style.backgroundImage = 'url(' + imageUrl + ')';
 
-        // Vytvořte marker a přidejte do mapy
-        new mapboxgl.Marker(el)
-          .setLngLat(coordinates)
-          .addTo(map);
-
-        // Přidání vyskakovacího okna s popisem
-        el.addEventListener('click', function() {
-          new mapboxgl.Popup()
+          // Vytvořte marker a přidejte do mapy
+          new mapboxgl.Marker(el)
             .setLngLat(coordinates)
-            .setHTML(`<strong>${city}, ${country}</strong>`)
             .addTo(map);
+
+          // Přidání vyskakovacího okna s popisem
+          el.addEventListener('click', function() {
+            new mapboxgl.Popup()
+              .setLngLat(coordinates)
+              .setHTML(`<strong>${city}, ${country}</strong>`)
+              .addTo(map);
+          });
         });
-      });
+      }
     });
   }
 
@@ -141,7 +143,9 @@
 
     gapi.client.sheets.spreadsheets.values.append(params, valueRangeBody).then(response => {
       console.log(response);
-      loadPins();
+      loadPins(); // Načtěte špendlíky znovu po přidání nového
+    }, err => {
+      console.error("Error adding pin to Google Sheets", err);
     });
   }
 
