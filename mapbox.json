@@ -1,0 +1,29 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [14.42076, 50.08804]
+      },
+      "properties": {
+        "city": "Prague",
+        "country": "Czech Republic",
+        "image": "https://images.app.goo.gl/395Row9BsyhsU6yr7"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.35222, 48.85661]
+      },
+      "properties": {
+        "city": "Paris",
+        "country": "France",
+        "image": "https://images.app.goo.gl/5sWGjWNhEZ7fSU1J8"
+      }
+    }
+  ]
+}
