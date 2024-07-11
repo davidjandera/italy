@@ -17,6 +17,18 @@
       background-size: cover;
       background-position: center;
     }
+    .marker-info {
+      text-align: center;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      width: 80px;
+      position: relative;
+      top: -20px;
+      background-color: rgba(255, 255, 255, 0.85);
+      border-radius: 4px;
+      padding: 4px;
+      white-space: nowrap;
+    }
     .cluster-count {
       display: flex;
       justify-content: center;
@@ -129,6 +141,11 @@
       var el = document.createElement('div');
       el.className = 'marker';
       el.style.backgroundImage = 'url(' + feature.properties.imageUrl + ')';
+      
+      var markerInfo = document.createElement('div');
+      markerInfo.className = 'marker-info';
+      markerInfo.textContent = feature.properties.city;
+      el.appendChild(markerInfo);
 
       var marker = new mapboxgl.Marker(el)
         .setLngLat(feature.geometry.coordinates)
